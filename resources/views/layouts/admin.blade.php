@@ -143,9 +143,10 @@
         Kelola User
     </a>
 
-    <a href="#">
-        Dataset Pelabuhan
-    </a>
+    <a href="{{ route('ports.index') }}"
+   class="{{ request()->is('ports*') ? 'active' : '' }}">
+    Dataset Pelabuhan
+</a>
 
     <a href="#">
         Artikel Analisis

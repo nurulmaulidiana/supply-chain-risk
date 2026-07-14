@@ -2,6 +2,6 @@
 
 @section('content')
 
-<h3>dashboard</h3>
+<h3>Nama Halaman</h3>
 
 @endsection
