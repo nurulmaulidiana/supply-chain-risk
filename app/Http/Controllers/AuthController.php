@@ -29,7 +29,7 @@ class AuthController extends Controller
                 return redirect('/admin/dashboard');
             }
 
-            return redirect('/user/dashboard');
+            return redirect()->route('user.country');
         }
 
         return back()->with('error', 'Email atau Password salah!');

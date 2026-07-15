@@ -29,9 +29,7 @@ Route::middleware('auth')->group(function () {
     Route::resource('users', UserController::class);
     Route::resource('ports', PortController::class);
 
-    // ================= USER =================
-
-    Route::view('/user/dashboard', 'user.dashboard')->name('user.dashboard');
+    
 
     // Global Country Dashboard (REST Countries API)
     Route::get('/user/country', [CountryController::class, 'index'])

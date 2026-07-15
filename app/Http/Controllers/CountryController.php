@@ -3,54 +3,53 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Http;
+use App\Services\CountryService;
 
 class CountryController extends Controller
 {
+    protected $countryService;
+
+    public function __construct(CountryService $countryService)
+    {
+        $this->countryService = $countryService;
+    }
+
     public function index(Request $request)
     {
-        // Ambil daftar negara dari World Bank
-        $response = Http::get(
-            'https://api.worldbank.org/v2/country?format=json&per_page=300'
-        );
+        $countries = $this->countryService->getCountries();
 
-        if (!$response->successful()) {
-
-            return view('user.country', [
-                'countries' => [],
-                'selectedCountry' => null,
-                'countryData' => null,
-            ]);
-
-        }
-
-        $data = $response->json();
-
-        $countries = collect($data[1] ?? [])
-            ->filter(function ($country) {
-                return $country['region']['id'] != 'NA';
-            })
-            ->sortBy('name')
-            ->values();
-
-        // kode negara yang dipilih (IDN, AUS, USA, dll)
-        $selectedCountry = $request->get('country');
+        $selectedCountry = $request->country;
 
         $countryData = null;
+        $gdp = null;
+        $population = null;
+        $inflation = null;
+        $currency = null;
 
         if ($selectedCountry) {
 
-            $countryData = $countries->firstWhere(
-                'id',
-                $selectedCountry
-            );
+            $countryData = $countries->firstWhere('id', $selectedCountry);
 
+            $gdp = $this->countryService->getGDP($selectedCountry);
+
+            $population = $this->countryService->getPopulation($selectedCountry);
+
+            $inflation = $this->countryService->getInflation($selectedCountry);
+
+            $currency = $this->countryService->getCurrency($selectedCountry);
         }
 
-        return view('user.country', compact(
-            'countries',
-            'selectedCountry',
-            'countryData'
-        ));
+        return view(
+            'user.country',
+            compact(
+                'countries',
+                'selectedCountry',
+                'countryData',
+                'gdp',
+                'population',
+                'inflation',
+                'currency'
+            )
+        );
     }
 }

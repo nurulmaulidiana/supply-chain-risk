@@ -1,7 +1,0 @@
-@extends('layouts.user')
-
-@section('content')
-
-<h3>dashboard</h3>
-
-@endsection

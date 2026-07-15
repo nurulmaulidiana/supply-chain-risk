@@ -155,7 +155,9 @@
 
     <div class="topbar d-flex justify-content-between">
 
-        <h5 class="mb-0">User Dashboard</h5>
+        <h5 class="mb-0">
+    Global Supply Chain Risk Intelligence Platform
+</h5>
 
         <strong>{{ Auth::user()->name }}</strong>
 

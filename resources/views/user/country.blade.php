@@ -43,85 +43,171 @@
 
         </form>
 
-        <hr>
-
         @if($countryData)
 
-            <div class="alert alert-success">
+        <hr>
 
-                <h5 class="mb-0">
+        <div class="alert alert-success">
 
-                    🌍 {{ $countryData['name'] }}
+            <h5 class="mb-0">
+                🌍 {{ $countryData['name'] }}
+            </h5>
 
-                </h5>
-
-            </div>
-
-            <div class="row mt-4">
-
-    <div class="col-md-3 mb-3">
-        <div class="card shadow-sm border-0">
-            <div class="card-body">
-                <small class="text-muted">GDP</small>
-                <h4 class="mt-2">$1.39 T</h4>
-            </div>
         </div>
-    </div>
 
-    <div class="col-md-3 mb-3">
-        <div class="card shadow-sm border-0">
-            <div class="card-body">
-                <small class="text-muted">Inflation</small>
-                <h4 class="mt-2">2.8%</h4>
+        <div class="row g-3">
+
+            {{-- GDP --}}
+            <div class="col-md-4">
+
+                <div class="card shadow-sm h-100">
+
+                    <div class="card-body text-center">
+
+                        <small class="text-muted">GDP</small>
+
+                        @if($gdp)
+
+                            <h3 class="mt-2 text-primary">
+                                {{ number_format($gdp,0,',','.') }}
+                            </h3>
+
+                        @else
+
+                            <h3 class="mt-2 text-primary">-</h3>
+
+                        @endif
+
+                    </div>
+
+                </div>
+
             </div>
-        </div>
-    </div>
 
-    <div class="col-md-3 mb-3">
-        <div class="card shadow-sm border-0">
-            <div class="card-body">
-                <small class="text-muted">Population</small>
-                <h4 class="mt-2">281 M</h4>
+            {{-- Inflation --}}
+            <div class="col-md-4">
+
+                <div class="card shadow-sm h-100">
+
+                    <div class="card-body text-center">
+
+                        <small class="text-muted">Inflation</small>
+
+                        @if($inflation)
+
+                            <h3 class="mt-2 text-warning">
+                                {{ number_format($inflation,2) }} %
+                            </h3>
+
+                        @else
+
+                            <h3 class="mt-2 text-warning">-</h3>
+
+                        @endif
+
+                    </div>
+
+                </div>
+
             </div>
-        </div>
-    </div>
 
-    <div class="col-md-3 mb-3">
-        <div class="card shadow-sm border-0">
-            <div class="card-body">
-                <small class="text-muted">Currency</small>
-                <h4 class="mt-2">IDR</h4>
+            {{-- Population --}}
+            <div class="col-md-4">
+
+                <div class="card shadow-sm h-100">
+
+                    <div class="card-body text-center">
+
+                        <small class="text-muted">Population</small>
+
+                        @if($population)
+
+                            <h3 class="mt-2 text-success">
+                                {{ number_format($population,0,',','.') }}
+                            </h3>
+
+                        @else
+
+                            <h3 class="mt-2 text-success">-</h3>
+
+                        @endif
+
+                    </div>
+
+                </div>
+
             </div>
-        </div>
-    </div>
 
-</div>
+            {{-- Currency --}}
+            <div class="col-md-4">
 
-<div class="row">
+                <div class="card shadow-sm h-100">
 
-    <div class="col-md-3 mb-3">
-        <div class="card shadow-sm border-0">
-            <div class="card-body">
-                <small class="text-muted">Weather</small>
-                <h4 class="mt-2">30°C</h4>
+                    <div class="card-body text-center">
+
+                        <small class="text-muted">Currency</small>
+
+                        @if($currency)
+
+                            <h3 class="mt-2 text-danger">
+                                {{ $currency }}
+                            </h3>
+
+                        @else
+
+                            <h3 class="mt-2 text-danger">-</h3>
+
+                        @endif
+
+                    </div>
+
+                </div>
+
             </div>
-        </div>
-    </div>
 
-    <div class="col-md-3 mb-3">
-        <div class="card shadow-sm border-0">
-            <div class="card-body">
-                <small class="text-muted">Risk Level</small>
-                <h4 class="text-success mt-2">Low</h4>
+            {{-- Weather --}}
+            <div class="col-md-4">
+
+                <div class="card shadow-sm h-100">
+
+                    <div class="card-body text-center">
+
+                        <small class="text-muted">Weather</small>
+
+                        <h3 class="mt-2 text-info">
+                            Loading...
+                        </h3>
+
+                    </div>
+
+                </div>
+
             </div>
-        </div>
-    </div>
 
-</div>
+            {{-- Risk Score --}}
+            <div class="col-md-4">
+
+                <div class="card shadow-sm h-100">
+
+                    <div class="card-body text-center">
+
+                        <small class="text-muted">Risk Score</small>
+
+                        <h3 class="mt-2 text-secondary">
+                            Loading...
+                        </h3>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
 
         @else
 
-            <div class="alert alert-info">
+            <div class="alert alert-info mt-3">
 
                 Silakan pilih negara terlebih dahulu.
 
