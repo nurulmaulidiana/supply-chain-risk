@@ -6,6 +6,8 @@ use Illuminate\Support\Facades\Http;
 
 class CountryService
 {
+  
+    // Daftar Negara (World Bank)
     public function getCountries()
     {
         $response = Http::get(
@@ -26,6 +28,27 @@ class CountryService
             ->values();
     }
 
+    // Koordinat Negara (Open-Meteo Geocoding)
+public function getCoordinate($countryName)
+{
+    $response = Http::get(
+        "https://geocoding-api.open-meteo.com/v1/search",
+        [
+            'name' => $countryName,
+            'count' => 1
+        ]
+    );
+
+    if (!$response->successful()) {
+        return null;
+    }
+
+    $data = $response->json();
+
+    return $data['results'][0] ?? null;
+}
+
+    // GDP
     public function getGDP($countryCode)
     {
         $response = Http::get(
@@ -39,6 +62,7 @@ class CountryService
         return $response->json()[1][0]['value'] ?? null;
     }
 
+    // Population
     public function getPopulation($countryCode)
     {
         $response = Http::get(
@@ -52,6 +76,7 @@ class CountryService
         return $response->json()[1][0]['value'] ?? null;
     }
 
+    // Inflation
     public function getInflation($countryCode)
     {
         $response = Http::get(
@@ -65,22 +90,22 @@ class CountryService
         return $response->json()[1][0]['value'] ?? null;
     }
 
-    public function getCurrency($countryCode)
+    // Weather (Open-Meteo API)
+    public function getWeather($latitude, $longitude)
     {
         $response = Http::get(
-            "https://restcountries.com/v3.1/alpha/$countryCode"
+            "https://api.open-meteo.com/v1/forecast",
+            [
+                'latitude' => $latitude,
+                'longitude' => $longitude,
+                'current' => 'temperature_2m,wind_speed_10m,rain'
+            ]
         );
 
         if (!$response->successful()) {
             return null;
         }
 
-        $country = $response->json()[0] ?? [];
-
-        if (!isset($country['currencies'])) {
-            return null;
-        }
-
-        return array_key_first($country['currencies']);
+        return $response->json()['current'] ?? null;
     }
 }

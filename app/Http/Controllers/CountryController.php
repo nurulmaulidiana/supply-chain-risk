@@ -21,35 +21,49 @@ class CountryController extends Controller
         $selectedCountry = $request->country;
 
         $countryData = null;
+
         $gdp = null;
         $population = null;
         $inflation = null;
-        $currency = null;
+        $weather = null;
+        $coordinate = null;
 
         if ($selectedCountry) {
 
             $countryData = $countries->firstWhere('id', $selectedCountry);
 
-            $gdp = $this->countryService->getGDP($selectedCountry);
+            if ($countryData) {
 
-            $population = $this->countryService->getPopulation($selectedCountry);
+                // Ambil koordinat dari Open-Meteo Geocoding
+                $coordinate = $this->countryService->getCoordinate(
+                    $countryData['name']
+                    );
+                    
+                    // World Bank
+                    $gdp = $this->countryService->getGDP($selectedCountry);
+                    $population = $this->countryService->getPopulation($selectedCountry);
+                    $inflation = $this->countryService->getInflation($selectedCountry);
 
-            $inflation = $this->countryService->getInflation($selectedCountry);
-
-            $currency = $this->countryService->getCurrency($selectedCountry);
+                    // Weather
+                    if ($coordinate) {
+                        $weather = $this->countryService->getWeather(
+                            $coordinate['latitude'],
+                            $coordinate['longitude']
+                            );
+                            }
+ }
         }
 
-        return view(
-            'user.country',
-            compact(
-                'countries',
-                'selectedCountry',
-                'countryData',
-                'gdp',
-                'population',
-                'inflation',
-                'currency'
-            )
-        );
+        return view('user.country', compact(
+    'countries',
+    'selectedCountry',
+    'countryData',
+    'gdp',
+    'population',
+    'inflation',
+    'weather',
+    'coordinate'
+));
+
     }
 }

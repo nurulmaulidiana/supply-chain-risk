@@ -5,6 +5,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\PortController;
 use App\Http\Controllers\CountryController;
+use App\Http\Controllers\WeatherController;
 
 Route::get('/', function () {
     return redirect('/login');
@@ -35,12 +36,16 @@ Route::middleware('auth')->group(function () {
     Route::get('/user/country', [CountryController::class, 'index'])
         ->name('user.country');
 
-    // Menu lainnya (sementara)
+    // Port Location
+    Route::get('/user/port-location', [PortController::class, 'index'])
+        ->name('user.port');
+
+    // Menu 
     Route::view('/user/risk', 'user.risk')->name('user.risk');
-    Route::view('/user/weather', 'user.weather')->name('user.weather');
+    Route::get('/user/weather', [WeatherController::class, 'index'])
+    ->name('user.weather');
     Route::view('/user/currency', 'user.currency')->name('user.currency');
     Route::view('/user/news', 'user.news')->name('user.news');
-    Route::view('/user/ports', 'user.ports')->name('user.ports');
     Route::view('/user/visualization', 'user.visualization')->name('user.visualization');
     Route::view('/user/comparison', 'user.comparison')->name('user.comparison');
     Route::view('/user/watchlist', 'user.watchlist')->name('user.watchlist');

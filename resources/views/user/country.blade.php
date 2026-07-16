@@ -4,16 +4,11 @@
 
 <div class="card shadow-sm">
 
-    <div class="card-header bg-white">
-        <h4 class="mb-0">🌍 Global Country Dashboard</h4>
-    </div>
-
     <div class="card-body">
 
         <form method="GET" action="{{ route('user.country') }}">
 
-            <div class="mb-3">
-
+            <div class="mb-4">
                 <label class="form-label fw-bold">
                     Pilih Negara
                 </label>
@@ -45,157 +40,151 @@
 
         @if($countryData)
 
-        <hr>
-
         <div class="alert alert-success">
-
             <h5 class="mb-0">
                 🌍 {{ $countryData['name'] }}
             </h5>
-
         </div>
 
-        <div class="row g-3">
+        <div class="row">
 
-            {{-- GDP --}}
-            <div class="col-md-4">
+            <!-- CARD KIRI -->
+            <div class="col-lg-3">
 
-                <div class="card shadow-sm h-100">
-
-                    <div class="card-body text-center">
-
+                <!-- GDP -->
+                <div class="card shadow-sm mb-3">
+                    <div class="card-body text-center py-3">
                         <small class="text-muted">GDP</small>
 
-                        @if($gdp)
-
-                            <h3 class="mt-2 text-primary">
-                                {{ number_format($gdp,0,',','.') }}
-                            </h3>
-
-                        @else
-
-                            <h3 class="mt-2 text-primary">-</h3>
-
-                        @endif
+                        <h6 class="mt-2 fw-bold">
+                            {{ $gdp ? number_format($gdp,0,',','.') : '-' }}
+                        </h6>
 
                     </div>
-
                 </div>
 
-            </div>
-
-            {{-- Inflation --}}
-            <div class="col-md-4">
-
-                <div class="card shadow-sm h-100">
-
-                    <div class="card-body text-center">
-
+                <!-- Inflation -->
+                <div class="card shadow-sm mb-3">
+                    <div class="card-body text-center py-3">
                         <small class="text-muted">Inflation</small>
 
-                        @if($inflation)
-
-                            <h3 class="mt-2 text-warning">
-                                {{ number_format($inflation,2) }} %
-                            </h3>
-
-                        @else
-
-                            <h3 class="mt-2 text-warning">-</h3>
-
-                        @endif
+                        <h6 class="mt-2 fw-bold">
+                            {{ $inflation ? number_format($inflation,2).' %' : '-' }}
+                        </h6>
 
                     </div>
-
                 </div>
 
-            </div>
-
-            {{-- Population --}}
-            <div class="col-md-4">
-
-                <div class="card shadow-sm h-100">
-
-                    <div class="card-body text-center">
-
+                <!-- Population -->
+                <div class="card shadow-sm mb-3">
+                    <div class="card-body text-center py-3">
                         <small class="text-muted">Population</small>
 
-                        @if($population)
-
-                            <h3 class="mt-2 text-success">
-                                {{ number_format($population,0,',','.') }}
-                            </h3>
-
-                        @else
-
-                            <h3 class="mt-2 text-success">-</h3>
-
-                        @endif
+                        <h6 class="mt-2 fw-bold">
+                            {{ $population ? number_format($population,0,',','.') : '-' }}
+                        </h6>
 
                     </div>
-
                 </div>
 
-            </div>
-
-            {{-- Currency --}}
-            <div class="col-md-4">
-
-                <div class="card shadow-sm h-100">
-
-                    <div class="card-body text-center">
-
+                <!-- Currency -->
+                <div class="card shadow-sm mb-3">
+                    <div class="card-body text-center py-3">
                         <small class="text-muted">Currency</small>
-
-                        @if($currency)
-
-                            <h3 class="mt-2 text-danger">
-                                {{ $currency }}
-                            </h3>
-
-                        @else
-
-                            <h3 class="mt-2 text-danger">-</h3>
-
-                        @endif
+                        <h6 class="mt-2 fw-bold">
+                             Coming Soon
+                            </h6>
 
                     </div>
-
                 </div>
 
-            </div>
-
-            {{-- Weather --}}
-            <div class="col-md-4">
-
-                <div class="card shadow-sm h-100">
-
-                    <div class="card-body text-center">
-
+                <!-- Weather -->
+                <div class="card shadow-sm mb-3">
+                    <div class="card-body text-center py-3">
                         <small class="text-muted">Weather</small>
 
-                        <h3 class="mt-2 text-info">
-                            Loading...
-                        </h3>
+                        <h6 class="mt-2 fw-bold">
+
+                            @if($weather)
+                                ⛅ {{ $weather['temperature_2m'] }} °C
+                            @else
+                                -
+                            @endif
+
+                        </h6>
 
                     </div>
+                </div>
 
+                <!-- Risk -->
+                <div class="card shadow-sm">
+                    <div class="card-body text-center py-3">
+                        <small class="text-muted">Risk Score</small>
+
+                        <h6 class="mt-2 fw-bold text-danger">
+                            Coming Soon
+                        </h6>
+
+                    </div>
                 </div>
 
             </div>
 
-            {{-- Risk Score --}}
-            <div class="col-md-4">
+            <!-- KANAN -->
+            <div class="col-lg-9">
 
-                <div class="card shadow-sm h-100">
+                <div class="card shadow-sm">
 
-                    <div class="card-body text-center">
+                    <div class="card-header bg-white">
 
-                        <small class="text-muted">Risk Score</small>
+                        <strong>Country Overview</strong>
 
-                        <h3 class="mt-2 text-secondary">
-                            Loading...
-                        </h3>
+                    </div>
+
+                    <div class="card-body">
+
+                        <h3>{{ $countryData['name'] }}</h3>
+
+                        <p class="text-muted">
+
+                            Dashboard monitoring negara yang dipilih.
+
+                        </p>
+
+                        <hr>
+
+                        <div id="map"
+                        style="height:520px;border-radius:10px;">
+                    </div>
+            @if($coordinate)
+            
+            <script>
+            document.addEventListener("DOMContentLoaded", function () {
+        var map = L.map('map').setView(
+            [{{ $coordinate['latitude'] }}, {{ $coordinate['longitude'] }}],
+        4
+    );
+
+    L.tileLayer(
+        'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+        {
+            attribution: '&copy; OpenStreetMap'
+        }
+    ).addTo(map);
+
+    L.marker([
+        {{ $coordinate['latitude'] }},
+        {{ $coordinate['longitude'] }}
+    ])
+    .addTo(map)
+    .bindPopup("{{ $countryData['name'] }}")
+    .openPopup();
+
+});
+
+</script>
+
+@endif
 
                     </div>
 
@@ -207,7 +196,7 @@
 
         @else
 
-            <div class="alert alert-info mt-3">
+            <div class="alert alert-info">
 
                 Silakan pilih negara terlebih dahulu.
 
