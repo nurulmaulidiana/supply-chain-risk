@@ -6,6 +6,8 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\PortController;
 use App\Http\Controllers\CountryController;
 use App\Http\Controllers\WeatherController;
+use App\Services\CountryService;
+use App\Http\Controllers\CurrencyController;
 
 Route::get('/', function () {
     return redirect('/login');
@@ -44,10 +46,10 @@ Route::middleware('auth')->group(function () {
     Route::view('/user/risk', 'user.risk')->name('user.risk');
     Route::get('/user/weather', [WeatherController::class, 'index'])
     ->name('user.weather');
-    Route::view('/user/currency', 'user.currency')->name('user.currency');
+    Route::get('/user/currency', [CurrencyController::class, 'index'])
+    ->name('user.currency');
     Route::view('/user/news', 'user.news')->name('user.news');
     Route::view('/user/visualization', 'user.visualization')->name('user.visualization');
     Route::view('/user/comparison', 'user.comparison')->name('user.comparison');
     Route::view('/user/watchlist', 'user.watchlist')->name('user.watchlist');
-
 });

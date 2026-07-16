@@ -8,9 +8,9 @@
 
         <form method="GET" action="{{ route('user.country') }}">
 
-            <div class="mb-4">
+            <div class="mb-3" style="max-width:300px;">
                 <label class="form-label fw-bold">
-                    Pilih Negara
+                    Select Country
                 </label>
 
                 <select
@@ -18,7 +18,7 @@
                     class="form-select"
                     onchange="this.form.submit()">
 
-                    <option value="">-- Pilih Negara --</option>
+                    <option value="">-- Select Country --</option>
 
                     @foreach($countries as $country)
 
@@ -135,26 +135,18 @@
 
                 <div class="card shadow-sm">
 
-                    <div class="card-header bg-white">
-
-                        <strong>Country Overview</strong>
-
-                    </div>
-
                     <div class="card-body">
 
-                        <h3>{{ $countryData['name'] }}</h3>
+                        <h4>{{ $countryData['name'] }}</h4>
 
-                        <p class="text-muted">
+                        <p class="text-muted mb-3">
 
-                            Dashboard monitoring negara yang dipilih.
+                            Global supply chain monitoring dashboard
 
                         </p>
 
-                        <hr>
-
                         <div id="map"
-                        style="height:520px;border-radius:10px;">
+                        style="height:430px;border-radius:10px;">
                     </div>
             @if($coordinate)
             
@@ -196,9 +188,9 @@
 
         @else
 
-            <div class="alert alert-info">
+            <div class="alert alert-info" >
 
-                Silakan pilih negara terlebih dahulu.
+                Please select a country.
 
             </div>
 
