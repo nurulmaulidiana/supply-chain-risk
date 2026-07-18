@@ -88,15 +88,16 @@
                 </div>
 
                 <!-- Currency -->
-                <div class="card shadow-sm mb-3">
-                    <div class="card-body text-center py-3">
-                        <small class="text-muted">Currency</small>
-                        <h6 class="mt-2 fw-bold">
-                             Coming Soon
-                            </h6>
+<div class="card shadow-sm mb-3">
+    <div class="card-body text-center py-3">
+        <small class="text-muted">Currency</small>
 
-                    </div>
-                </div>
+        <h6 class="mt-2 fw-bold">
+            {{ $currencyCode ?? '-' }}
+        </h6>
+
+    </div>
+</div>
 
                 <!-- Weather -->
                 <div class="card shadow-sm mb-3">
@@ -144,7 +145,25 @@
                             Global supply chain monitoring dashboard
 
                         </p>
+                        @if($isWatchlist)
 
+<button class="btn btn-secondary mb-3" disabled>
+    ✔ Added to Watchlist
+</button>
+
+@else
+
+<form action="{{ route('watchlist.store') }}" method="POST" class="mb-3">
+    @csrf
+
+    <input type="hidden" name="country_id" value="{{ $countryData->id }}">
+
+    <button type="submit" class="btn btn-warning">
+        ⭐ Add to Watchlist
+    </button>
+</form>
+
+@endif
                         <div id="map"
                         style="height:430px;border-radius:10px;">
                     </div>

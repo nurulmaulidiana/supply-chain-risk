@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\Country;
 use App\Services\CountryService;
+use App\Models\Watchlist;
 
 class CountryController extends Controller
 {
@@ -16,54 +18,68 @@ class CountryController extends Controller
 
     public function index(Request $request)
     {
-        $countries = $this->countryService->getCountries();
+        // Ambil daftar negara dari database
+        $countries = Country::orderBy('name')->get();
 
         $selectedCountry = $request->country;
 
         $countryData = null;
-
+        $country = null;
+        $currencyCode = null;
         $gdp = null;
         $population = null;
         $inflation = null;
         $weather = null;
         $coordinate = null;
+        $isWatchlist = false;
 
         if ($selectedCountry) {
 
-            $countryData = $countries->firstWhere('id', $selectedCountry);
+            // Cari negara berdasarkan ID database
+            $countryData = Country::find($selectedCountry);
 
             if ($countryData) {
 
-                // Ambil koordinat dari Open-Meteo Geocoding
-                $coordinate = $this->countryService->getCoordinate(
-                    $countryData['name']
-                    );
-                    
-                    // World Bank
-                    $gdp = $this->countryService->getGDP($selectedCountry);
-                    $population = $this->countryService->getPopulation($selectedCountry);
-                    $inflation = $this->countryService->getInflation($selectedCountry);
+                // Ambil detail negara dari REST Countries
+                $country = $this->countryService->getCountryDetail($countryData->name);
 
-                    // Weather
-                    if ($coordinate) {
-                        $weather = $this->countryService->getWeather(
-                            $coordinate['latitude'],
-                            $coordinate['longitude']
-                            );
-                            }
- }
+                if ($country) {
+                    $currencyCode = $country['currencies'][0]['code'] ?? null;
+                }
+
+                // Ambil koordinat
+                $coordinate = $this->countryService->getCoordinate($countryData->name);
+
+                // Data World Bank menggunakan ISO3
+                $gdp = $this->countryService->getGDP($countryData->iso3);
+                $population = $this->countryService->getPopulation($countryData->iso3);
+                $inflation = $this->countryService->getInflation($countryData->iso3);
+
+                // Weather
+                if ($coordinate) {
+                    $weather = $this->countryService->getWeather(
+                        $coordinate['latitude'],
+                        $coordinate['longitude']
+                    );
+                }
+                $isWatchlist = Watchlist::where('user_id', auth()->id())
+    ->where('country_id', $countryData->id)
+    ->exists();
+            }
         }
 
         return view('user.country', compact(
-    'countries',
-    'selectedCountry',
-    'countryData',
-    'gdp',
-    'population',
-    'inflation',
-    'weather',
-    'coordinate'
-));
-
+            'countries',
+            'selectedCountry',
+            'countryData',
+            'gdp',
+            'population',
+            'inflation',
+            'weather',
+            'coordinate',
+            'country',
+            'currencyCode',
+            'isWatchlist'
+        ));
     }
 }

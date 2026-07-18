@@ -9,7 +9,7 @@
     <!-- Bootstrap -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet">
 
-    <!-- Leaflet CSS -->
+    <!-- Leaflet -->
     <link rel="stylesheet"
         href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 
@@ -39,11 +39,6 @@
         .logo h3 {
             margin: 0;
             font-weight: bold;
-        }
-
-        .logo p {
-            margin: 5px 0 0;
-            font-size: 14px;
         }
 
         .sidebar a {
@@ -160,37 +155,39 @@
 <div class="content">
 
     <div class="topbar d-flex justify-content-between">
-         <h5 class="mb-0">
-             @if(request()->is('user/country'))
-             🌍 Global Country Dashboard
 
-              @elseif(request()->is('user/risk'))
-             📊 Risk Scoring Engine
+        <h5 class="mb-0">
 
-              @elseif(request()->is('user/weather'))
-             ⛅ Weather Monitor
+            @if(request()->is('user/country'))
+                🌍 Global Country Dashboard
 
-              @elseif(request()->is('user/currency'))
-             💱 Currency Impact
+            @elseif(request()->is('user/risk'))
+                📊 Risk Scoring Engine
 
-              @elseif(request()->is('user/news'))
-             📰 News Intelligence
+            @elseif(request()->is('user/weather'))
+                ⛅ Weather Monitor
 
-              @elseif(request()->is('user/port-location'))
-             ⚓ Port Location
+            @elseif(request()->is('user/currency'))
+                💱 Currency Impact
 
-             @elseif(request()->is('user/visualization'))
-             📈 Data Visualization
+            @elseif(request()->is('user/news'))
+                📰 News Intelligence
 
-             @elseif(request()->is('user/comparison'))
-             ⚖️ Country Comparison
+            @elseif(request()->is('user/port-location'))
+                ⚓ Port Location
 
-             @elseif(request()->is('user/watchlist'))
-             ⭐ Watchlist
+            @elseif(request()->is('user/visualization'))
+                📈 Data Visualization
+
+            @elseif(request()->is('user/comparison'))
+                ⚖️ Country Comparison
+
+            @elseif(request()->is('user/watchlist'))
+                ⭐ Watchlist
 
             @else
-             Supply Chain Risk
-        @endif
+                Supply Chain Risk
+            @endif
 
         </h5>
 
@@ -202,11 +199,17 @@
 
 </div>
 
-<!-- Bootstrap JS -->
+<!-- Bootstrap -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"></script>
 
-<!-- Leaflet JS -->
+<!-- Leaflet -->
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<!-- Script dari masing-masing halaman -->
+@stack('scripts')
 
 </body>
 </html>

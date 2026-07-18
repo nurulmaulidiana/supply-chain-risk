@@ -11,7 +11,7 @@
             <div class="mb-3" style="max-width:300px;">
 
                 <label class="form-label fw-bold">
-                    Pilih Negara
+                    Select Country
                 </label>
 
                 <select
@@ -19,7 +19,7 @@
                     class="form-select"
                     onchange="this.form.submit()">
 
-                    <option value="">-- Pilih Negara --</option>
+                    <option value="">-- Select Country --</option>
 
                     @foreach($countries as $country)
 
@@ -143,12 +143,6 @@
         </div>
 
         @else
-
-        <div class="alert alert-info">
-
-            Silakan pilih negara terlebih dahulu.
-
-        </div>
 
         @endif
 
