@@ -31,6 +31,8 @@ class CountryController extends Controller
         $gdp = null;
         $population = null;
         $inflation = null;
+        $exports = null;
+        $imports = null;
         $weather = null;
         $coordinate = null;
         $isWatchlist = false;
@@ -58,6 +60,28 @@ class CountryController extends Controller
                 $gdp = $this->countryService->getGDP($countryData->iso3);
                 $population = $this->countryService->getPopulation($countryData->iso3);
                 $inflation = $this->countryService->getInflation($countryData->iso3);
+                $exports = $this->countryService->getExports($countryData->iso3);
+                $imports = $this->countryService->getImports($countryData->iso3);
+
+                // Ambil data lama dari database (kalau ada) sebagai fallback
+                $existingData = EconomicData::where('country', $countryData->name)->first();
+
+                // Kalau API gagal (null), pakai data lama yang tersimpan
+                if ($gdp === null && $existingData) {
+                    $gdp = $existingData->gdp;
+                }
+                if ($population === null && $existingData) {
+                    $population = $existingData->population;
+                }
+                if ($inflation === null && $existingData) {
+                    $inflation = $existingData->inflation;
+                }
+                if ($exports === null && $existingData) {
+                    $exports = $existingData->exports;
+                }
+                if ($imports === null && $existingData) {
+                    $imports = $existingData->imports;
+                }
 
                 EconomicData::updateOrCreate(
                     [
@@ -68,8 +92,8 @@ class CountryController extends Controller
                         'gdp'          => $gdp,
                         'inflation'    => $inflation,
                         'population'   => $population,
-                        'exports'      => null,
-                        'imports'      => null,
+                        'exports'      => $exports,
+                        'imports'      => $imports,
                     ]
                 );
 
@@ -149,6 +173,8 @@ class CountryController extends Controller
             'gdp',
             'population',
             'inflation',
+            'exports',
+            'imports',
             'weather',
             'coordinate',
             'country',

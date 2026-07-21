@@ -87,6 +87,30 @@
                     </div>
                 </div>
 
+                <!-- Exports -->
+                <div class="card shadow-sm mb-3">
+                    <div class="card-body text-center py-3">
+                        <small class="text-muted">Exports</small>
+
+                        <h6 class="mt-2 fw-bold">
+                            {{ $exports ? '$'.number_format($exports/1000000000,2).'B' : '-' }}
+                        </h6>
+
+                    </div>
+                </div>
+
+                <!-- Imports -->
+                <div class="card shadow-sm mb-3">
+                    <div class="card-body text-center py-3">
+                        <small class="text-muted">Imports</small>
+
+                        <h6 class="mt-2 fw-bold">
+                            {{ $imports ? '$'.number_format($imports/1000000000,2).'B' : '-' }}
+                        </h6>
+
+                    </div>
+                </div>
+
                 <!-- Currency -->
                 <div class="card shadow-sm mb-3">
                     <div class="card-body text-center py-3">
@@ -117,7 +141,7 @@
                     </div>
                 </div>
 
-                <!-- Risk Score (DIPERBARUI) -->
+                <!-- Risk Score -->
                 <div class="card shadow-sm">
                     <div class="card-body text-center py-3">
                         <small class="text-muted">Risk Score</small>

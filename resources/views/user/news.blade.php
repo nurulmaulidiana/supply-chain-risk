@@ -118,5 +118,57 @@
     </div>
 
 </div>
+{{-- ================= Artikel Analisis ================= --}}
 
+<div class="card shadow-sm mt-4">
+
+    <div class="card-header bg-white">
+
+        <h4 class="mb-0">
+            📚 Artikel Analisis
+        </h4>
+
+    </div>
+
+    <div class="card-body">
+
+        @if($adminArticles->count())
+
+            @foreach($adminArticles as $article)
+
+                <div class="border-bottom pb-4 mb-4">
+
+                    @if($article->category)
+                        <span class="badge bg-secondary mb-2">
+                            {{ $article->category }}
+                        </span>
+                    @endif
+
+                    <h4 class="fw-bold">
+                        {{ $article->title }}
+                    </h4>
+
+                    <small class="text-muted">
+                        {{ $article->created_at->format('d M Y') }}
+                    </small>
+
+                    <div class="mt-3">
+                        {!! nl2br(e($article->content)) !!}
+                    </div>
+
+                </div>
+
+            @endforeach
+
+        @else
+
+            <div class="alert alert-warning mb-0">
+                Belum ada artikel analisis.
+            </div>
+
+        @endif
+
+    </div>
+
+</div>
 @endsection

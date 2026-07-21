@@ -106,29 +106,47 @@ class CountryService
     }
 
     // =========================
-    // GDP
+    // Helper: ambil data valid terbaru dari World Bank
+    // (cek tahun terbaru dulu, kalau kosong mundur ke tahun sebelumnya)
     // =========================
-    public function getGDP($countryCode)
+    private function getLatestWorldBankValue($countryCode, $indicator)
     {
         try {
 
             $response = Http::timeout(10)
                 ->retry(2, 500)
                 ->get(
-                    "https://api.worldbank.org/v2/country/$countryCode/indicator/NY.GDP.MKTP.CD?format=json&per_page=1"
+                    "https://api.worldbank.org/v2/country/$countryCode/indicator/$indicator?format=json&per_page=10"
                 );
 
             if (!$response->successful()) {
                 return null;
             }
 
-            return $response->json()[1][0]['value'] ?? null;
+            $data = $response->json()[1] ?? [];
+
+            // Data dari World Bank sudah urut dari tahun terbaru ke terlama
+            foreach ($data as $entry) {
+                if ($entry['value'] !== null) {
+                    return $entry['value'];
+                }
+            }
+
+            return null;
 
         } catch (\Exception $e) {
 
             return null;
 
         }
+    }
+
+    // =========================
+    // GDP
+    // =========================
+    public function getGDP($countryCode)
+    {
+        return $this->getLatestWorldBankValue($countryCode, 'NY.GDP.MKTP.CD');
     }
 
     // =========================
@@ -136,25 +154,7 @@ class CountryService
     // =========================
     public function getPopulation($countryCode)
     {
-        try {
-
-            $response = Http::timeout(10)
-                ->retry(2, 500)
-                ->get(
-                    "https://api.worldbank.org/v2/country/$countryCode/indicator/SP.POP.TOTL?format=json&per_page=1"
-                );
-
-            if (!$response->successful()) {
-                return null;
-            }
-
-            return $response->json()[1][0]['value'] ?? null;
-
-        } catch (\Exception $e) {
-
-            return null;
-
-        }
+        return $this->getLatestWorldBankValue($countryCode, 'SP.POP.TOTL');
     }
 
     // =========================
@@ -162,25 +162,23 @@ class CountryService
     // =========================
     public function getInflation($countryCode)
     {
-        try {
+        return $this->getLatestWorldBankValue($countryCode, 'FP.CPI.TOTL.ZG');
+    }
 
-            $response = Http::timeout(10)
-                ->retry(2, 500)
-                ->get(
-                    "https://api.worldbank.org/v2/country/$countryCode/indicator/FP.CPI.TOTL.ZG?format=json&per_page=1"
-                );
+    // =========================
+    // Exports (nilai ekspor barang & jasa dalam USD)
+    // =========================
+    public function getExports($countryCode)
+    {
+        return $this->getLatestWorldBankValue($countryCode, 'NE.EXP.GNFS.CD');
+    }
 
-            if (!$response->successful()) {
-                return null;
-            }
-
-            return $response->json()[1][0]['value'] ?? null;
-
-        } catch (\Exception $e) {
-
-            return null;
-
-        }
+    // =========================
+    // Imports (nilai impor barang & jasa dalam USD)
+    // =========================
+    public function getImports($countryCode)
+    {
+        return $this->getLatestWorldBankValue($countryCode, 'NE.IMP.GNFS.CD');
     }
 
     // =========================
@@ -244,35 +242,36 @@ class CountryService
 
         }
     }
+
     // =========================
-// GNews API
-// =========================
-public function getNews($country)
-{
-    try {
+    // GNews API
+    // =========================
+    public function getNews($country)
+    {
+        try {
 
-        $response = Http::timeout(10)
-            ->retry(2, 500)
-            ->get(
-                'https://gnews.io/api/v4/search',
-                [
-                    'q' => $country,
-                    'lang' => 'en',
-                    'max' => 10,
-                    'apikey' => env('GNEWS_API_KEY')
-                ]
-            );
+            $response = Http::timeout(10)
+                ->retry(2, 500)
+                ->get(
+                    'https://gnews.io/api/v4/search',
+                    [
+                        'q' => $country,
+                        'lang' => 'en',
+                        'max' => 10,
+                        'apikey' => env('GNEWS_API_KEY')
+                    ]
+                );
 
-        if (!$response->successful()) {
+            if (!$response->successful()) {
+                return [];
+            }
+
+            return $response->json()['articles'] ?? [];
+
+        } catch (\Exception $e) {
+
             return [];
+
         }
-
-        return $response->json()['articles'] ?? [];
-
-    } catch (\Exception $e) {
-
-        return [];
-
     }
-}
 }

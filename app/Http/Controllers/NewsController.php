@@ -5,37 +5,13 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Services\CountryService;
 use App\Models\NewsCache;
+use App\Models\Article;
+use App\Models\PositiveWord;
+use App\Models\NegativeWord;
 
 class NewsController extends Controller
 {
     protected $countryService;
-
-    private $positiveWords = [
-        'growth',
-        'increase',
-        'improve',
-        'profit',
-        'stable',
-        'recovery',
-        'success',
-        'boost',
-        'expand',
-        'strong'
-    ];
-
-    private $negativeWords = [
-        'war',
-        'crisis',
-        'delay',
-        'storm',
-        'inflation',
-        'disaster',
-        'conflict',
-        'decline',
-        'loss',
-        'risk',
-        'shortage'
-    ];
 
     public function __construct(CountryService $countryService)
     {
@@ -44,44 +20,43 @@ class NewsController extends Controller
 
     private function analyzeSentiment($text)
     {
+        // Menyambungkan langsung ke database tabel positive_words dan negative_words
+        $positiveWords = PositiveWord::pluck('word')->toArray();
+        $negativeWords = NegativeWord::pluck('word')->toArray();
+
         $text = strtolower($text);
 
         $positive = 0;
         $negative = 0;
 
-        foreach ($this->positiveWords as $word) {
+        foreach ($positiveWords as $word) {
             if (str_contains($text, $word)) {
                 $positive++;
             }
         }
 
-        foreach ($this->negativeWords as $word) {
+        foreach ($negativeWords as $word) {
             if (str_contains($text, $word)) {
                 $negative++;
             }
         }
 
+        // Tanpa Neutral: kalau seri (termasuk 0-0), default ke Negative
+        // karena berita yang tidak eksplisit positif kemungkinan besar berita insiden/gangguan
         if ($positive > $negative) {
             return 'Positive';
         }
 
-        if ($negative > $positive) {
-            return 'Negative';
-        }
-
-        return 'Neutral';
+        return 'Negative';
     }
 
     public function index(Request $request)
     {
         $countries = $this->countryService->getCountries();
-
         $selectedCountry = $request->country;
-
         $articles = collect();
 
         if ($selectedCountry) {
-
             $news = $this->countryService->getNews($selectedCountry);
 
             foreach ($news as $item) {
@@ -118,10 +93,14 @@ class NewsController extends Controller
             }
         }
 
+        // Ambil artikel buatan admin
+        $adminArticles = Article::latest()->get();
+
         return view('user.news', compact(
             'countries',
             'selectedCountry',
-            'articles'
+            'articles',
+            'adminArticles'
         ));
     }
 }
