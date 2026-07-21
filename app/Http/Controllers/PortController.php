@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 
 class PortController extends Controller
 {
-    // Menampilkan semua data pelabuhan
+
     public function index()
     {
         $ports = Port::all();
@@ -15,37 +15,42 @@ class PortController extends Controller
         return view('admin.ports.index', compact('ports'));
     }
 
-    // Form tambah pelabuhan
+
     public function create()
     {
         return view('admin.ports.create');
     }
 
-    // Simpan pelabuhan
+
     public function store(Request $request)
     {
         $request->validate([
-            'name' => 'required',
-            'country' => 'required',
-            'status' => 'required',
-            'risk_level' => 'required',
-            'description' => 'nullable'
+            'name'=>'required',
+            'country'=>'required',
+            'status'=>'required',
+            'risk_level'=>'required'
         ]);
 
-        Port::create($request->all());
+
+        Port::create([
+
+            'name'=>$request->name,
+            'country'=>$request->country,
+            'status'=>$request->status,
+            'risk_level'=>$request->risk_level,
+            'description'=>$request->description
+
+        ]);
+
 
         return redirect()
             ->route('ports.index')
-            ->with('success','Data pelabuhan berhasil ditambahkan.');
-    }
-
-    // Detail (belum dipakai)
-    public function show(Port $port)
-    {
+            ->with('success','Pelabuhan berhasil ditambahkan');
 
     }
 
-    // Form edit
+
+
     public function edit($id)
     {
         $port = Port::findOrFail($id);
@@ -53,35 +58,35 @@ class PortController extends Controller
         return view('admin.ports.edit', compact('port'));
     }
 
-    // Update
-    public function update(Request $request, $id)
+
+
+    public function update(Request $request,$id)
     {
-        $request->validate([
-            'name' => 'required',
-            'country' => 'required',
-            'status' => 'required',
-            'risk_level' => 'required',
-            'description' => 'nullable'
-        ]);
 
         $port = Port::findOrFail($id);
+
 
         $port->update($request->all());
 
+
         return redirect()
             ->route('ports.index')
-            ->with('success','Data pelabuhan berhasil diupdate.');
+            ->with('success','Pelabuhan berhasil diubah');
+
     }
 
-    // Hapus
+
+
     public function destroy($id)
     {
-        $port = Port::findOrFail($id);
 
-        $port->delete();
+        Port::findOrFail($id)->delete();
+
 
         return redirect()
             ->route('ports.index')
-            ->with('success','Data pelabuhan berhasil dihapus.');
+            ->with('success','Pelabuhan berhasil dihapus');
+
     }
+
 }

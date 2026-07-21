@@ -244,4 +244,35 @@ class CountryService
 
         }
     }
+    // =========================
+// GNews API
+// =========================
+public function getNews($country)
+{
+    try {
+
+        $response = Http::timeout(10)
+            ->retry(2, 500)
+            ->get(
+                'https://gnews.io/api/v4/search',
+                [
+                    'q' => $country,
+                    'lang' => 'en',
+                    'max' => 10,
+                    'apikey' => env('GNEWS_API_KEY')
+                ]
+            );
+
+        if (!$response->successful()) {
+            return [];
+        }
+
+        return $response->json()['articles'] ?? [];
+
+    } catch (\Exception $e) {
+
+        return [];
+
+    }
+}
 }

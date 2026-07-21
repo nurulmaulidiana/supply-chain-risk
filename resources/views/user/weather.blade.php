@@ -49,7 +49,9 @@
                 <div class="card shadow-sm mb-2">
                     <div class="card-body text-center py-2">
 
-                        <small class="text-muted">Temperature</small>
+                        <small class="text-muted">
+                            Temperature
+                        </small>
 
                         <h5 class="mt-1 fw-bold">
 
@@ -63,7 +65,9 @@
                 <div class="card shadow-sm mb-2">
                     <div class="card-body text-center py-2">
 
-                        <small class="text-muted">Wind Speed</small>
+                        <small class="text-muted">
+                            Wind Speed
+                        </small>
 
                         <h5 class="mt-1 fw-bold">
 
@@ -77,7 +81,9 @@
                 <div class="card shadow-sm mb-2">
                     <div class="card-body text-center py-2">
 
-                        <small class="text-muted">Rain</small>
+                        <small class="text-muted">
+                            Rain
+                        </small>
 
                         <h5 class="mt-1 fw-bold">
 
@@ -106,15 +112,16 @@
 
             </div>
 
-            <!-- BAGIAN KANAN -->
-
+            <!-- KANAN -->
             <div class="col-lg-9">
 
                 <div class="card shadow-sm">
 
                     <div class="card-header bg-white">
 
-                        <strong>Weather Overview</strong>
+                        <strong>
+                            Weather Overview
+                        </strong>
 
                     </div>
 
@@ -142,8 +149,6 @@
 
         </div>
 
-        @else
-
         @endif
 
     </div>
@@ -151,6 +156,8 @@
 </div>
 
 @if($coordinate)
+
+@push('scripts')
 
 <script>
 
@@ -173,12 +180,14 @@ document.addEventListener("DOMContentLoaded", function(){
         {{ $coordinate['longitude'] }}
     ])
     .addTo(map)
-    .bindPopup("{{ $countryData['name'] }}")
+    .bindPopup("<b>{{ $countryData['name'] }}</b>")
     .openPopup();
 
 });
 
 </script>
+
+@endpush
 
 @endif
 

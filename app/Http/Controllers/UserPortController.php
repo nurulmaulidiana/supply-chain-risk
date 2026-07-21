@@ -8,7 +8,9 @@ class UserPortController extends Controller
 {
     public function index()
     {
-        $ports = Port::all();
+        $ports = Port::orderBy('country')
+                     ->orderBy('name')
+                     ->get();
 
         return view('user.port', compact('ports'));
     }

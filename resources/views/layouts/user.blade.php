@@ -10,8 +10,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet">
 
     <!-- Leaflet -->
-    <link rel="stylesheet"
-        href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 
     <style>
         body {
@@ -103,8 +102,8 @@
         🌍 Global Country Dashboard
     </a>
 
-    <a href="{{ route('user.risk') }}"
-        class="{{ request()->is('user/risk') ? 'active' : '' }}">
+    <a href="{{ route('user.risk-scoring') }}"
+        class="{{ request()->is('user/risk-scoring') ? 'active' : '' }}">
         📊 Risk Scoring Engine
     </a>
 
@@ -161,7 +160,7 @@
             @if(request()->is('user/country'))
                 🌍 Global Country Dashboard
 
-            @elseif(request()->is('user/risk'))
+            @elseif(request()->is('user/risk-scoring'))
                 📊 Risk Scoring Engine
 
             @elseif(request()->is('user/weather'))

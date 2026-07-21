@@ -6,6 +6,8 @@ use Illuminate\Http\Request;
 use App\Models\Country;
 use App\Services\CountryService;
 use App\Models\Watchlist;
+use App\Models\EconomicData;
+use App\Models\RiskScore;
 
 class CountryController extends Controller
 {
@@ -32,6 +34,8 @@ class CountryController extends Controller
         $weather = null;
         $coordinate = null;
         $isWatchlist = false;
+        $riskScore = null;
+        $riskLevel = null;
 
         if ($selectedCountry) {
 
@@ -55,6 +59,20 @@ class CountryController extends Controller
                 $population = $this->countryService->getPopulation($countryData->iso3);
                 $inflation = $this->countryService->getInflation($countryData->iso3);
 
+                EconomicData::updateOrCreate(
+                    [
+                        'country' => $countryData->name
+                    ],
+                    [
+                        'country_code' => $countryData->iso3,
+                        'gdp'          => $gdp,
+                        'inflation'    => $inflation,
+                        'population'   => $population,
+                        'exports'      => null,
+                        'imports'      => null,
+                    ]
+                );
+
                 // Weather
                 if ($coordinate) {
                     $weather = $this->countryService->getWeather(
@@ -62,9 +80,65 @@ class CountryController extends Controller
                         $coordinate['longitude']
                     );
                 }
+
                 $isWatchlist = Watchlist::where('user_id', auth()->id())
-    ->where('country_id', $countryData->id)
-    ->exists();
+                    ->where('country_id', $countryData->id)
+                    ->exists();
+
+                // =============================
+                // AUTO CREATE RISK SCORE
+                // =============================
+
+                $risk = RiskScore::where('country', $countryData->name)
+                    ->first();
+
+                if (!$risk) {
+
+                    // contoh bobot sederhana
+                    $weatherScore = 20;
+
+                    // inflation
+                    if ($inflation !== null && $inflation > 5) {
+                        $inflationScore = 60;
+                    } else {
+                        $inflationScore = 20;
+                    }
+
+                    // news sementara dummy
+                    $newsScore = 40;
+
+                    // currency sementara
+                    $currencyScore = 20;
+
+                    // total
+                    $totalScore = (
+                        $weatherScore +
+                        $inflationScore +
+                        $newsScore +
+                        $currencyScore
+                    ) / 4;
+
+                    if ($totalScore >= 70) {
+                        $calculatedRiskLevel = "High Risk";
+                    } elseif ($totalScore >= 40) {
+                        $calculatedRiskLevel = "Medium Risk";
+                    } else {
+                        $calculatedRiskLevel = "Low Risk";
+                    }
+
+                    $risk = RiskScore::create([
+                        'country'        => $countryData->name,
+                        'weather_score'  => $weatherScore,
+                        'inflation_score'=> $inflationScore,
+                        'news_score'     => $newsScore,
+                        'currency_score' => $currencyScore,
+                        'total_score'    => $totalScore,
+                        'risk_level'     => $calculatedRiskLevel
+                    ]);
+                }
+
+                $riskScore = $risk->total_score;
+                $riskLevel = $risk->risk_level;
             }
         }
 
@@ -79,7 +153,9 @@ class CountryController extends Controller
             'coordinate',
             'country',
             'currencyCode',
-            'isWatchlist'
+            'isWatchlist',
+            'riskScore',
+            'riskLevel'
         ));
     }
 }

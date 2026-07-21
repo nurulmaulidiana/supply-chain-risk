@@ -88,16 +88,16 @@
                 </div>
 
                 <!-- Currency -->
-<div class="card shadow-sm mb-3">
-    <div class="card-body text-center py-3">
-        <small class="text-muted">Currency</small>
+                <div class="card shadow-sm mb-3">
+                    <div class="card-body text-center py-3">
+                        <small class="text-muted">Currency</small>
 
-        <h6 class="mt-2 fw-bold">
-            {{ $currencyCode ?? '-' }}
-        </h6>
+                        <h6 class="mt-2 fw-bold">
+                            {{ $currencyCode ?? '-' }}
+                        </h6>
 
-    </div>
-</div>
+                    </div>
+                </div>
 
                 <!-- Weather -->
                 <div class="card shadow-sm mb-3">
@@ -117,14 +117,26 @@
                     </div>
                 </div>
 
-                <!-- Risk -->
+                <!-- Risk Score (DIPERBARUI) -->
                 <div class="card shadow-sm">
                     <div class="card-body text-center py-3">
                         <small class="text-muted">Risk Score</small>
 
-                        <h6 class="mt-2 fw-bold text-danger">
-                            Coming Soon
-                        </h6>
+                        @if($riskScore)
+                            <h6 class="mt-2 fw-bold text-dark">
+                                {{ round($riskScore) }}
+                            </h6>
+                            <small class="badge bg-secondary">
+                                {{ $riskLevel }}
+                            </small>
+                        @else
+                            <h6 class="mt-2 fw-bold text-muted">
+                                --
+                            </h6>
+                            <small class="text-muted">
+                                Belum dihitung
+                            </small>
+                        @endif
 
                     </div>
                 </div>
@@ -147,55 +159,51 @@
                         </p>
                         @if($isWatchlist)
 
-<button class="btn btn-secondary mb-3" disabled>
-    ✔ Added to Watchlist
-</button>
+                        <button class="btn btn-secondary mb-3" disabled>
+                            ✔ Added to Watchlist
+                        </button>
 
-@else
+                        @else
 
-<form action="{{ route('watchlist.store') }}" method="POST" class="mb-3">
-    @csrf
+                        <form action="{{ route('watchlist.store') }}" method="POST" class="mb-3">
+                            @csrf
 
-    <input type="hidden" name="country_id" value="{{ $countryData->id }}">
+                            <input type="hidden" name="country_id" value="{{ $countryData->id }}">
 
-    <button type="submit" class="btn btn-warning">
-        ⭐ Add to Watchlist
-    </button>
-</form>
+                            <button type="submit" class="btn btn-warning">
+                                ⭐ Add to Watchlist
+                            </button>
+                        </form>
 
-@endif
-                        <div id="map"
-                        style="height:430px;border-radius:10px;">
-                    </div>
-            @if($coordinate)
-            
-            <script>
-            document.addEventListener("DOMContentLoaded", function () {
-        var map = L.map('map').setView(
-            [{{ $coordinate['latitude'] }}, {{ $coordinate['longitude'] }}],
-        4
-    );
+                        @endif
+                        
+                        <div id="map" style="height:430px;border-radius:10px;"></div>
 
-    L.tileLayer(
-        'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-        {
-            attribution: '&copy; OpenStreetMap'
-        }
-    ).addTo(map);
+                        @if($coordinate)
+                            <script>
+                            document.addEventListener("DOMContentLoaded", function () {
+                                var map = L.map('map').setView(
+                                    [{{ $coordinate['latitude'] }}, {{ $coordinate['longitude'] }}],
+                                    4
+                                );
 
-    L.marker([
-        {{ $coordinate['latitude'] }},
-        {{ $coordinate['longitude'] }}
-    ])
-    .addTo(map)
-    .bindPopup("{{ $countryData['name'] }}")
-    .openPopup();
+                                L.tileLayer(
+                                    'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+                                    {
+                                        attribution: '&copy; OpenStreetMap'
+                                    }
+                                ).addTo(map);
 
-});
-
-</script>
-
-@endif
+                                L.marker([
+                                    {{ $coordinate['latitude'] }},
+                                    {{ $coordinate['longitude'] }}
+                                ])
+                                .addTo(map)
+                                .bindPopup("{{ $countryData['name'] }}")
+                                .openPopup();
+                            });
+                            </script>
+                        @endif
 
                     </div>
 
@@ -207,7 +215,7 @@
 
         @else
 
-            <div class="alert alert-info" >
+            <div class="alert alert-info">
 
                 Please select a country.
 

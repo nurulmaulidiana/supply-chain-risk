@@ -9,6 +9,11 @@ use App\Http\Controllers\WeatherController;
 use App\Http\Controllers\CurrencyController;
 use App\Http\Controllers\WatchlistController;
 use App\Http\Controllers\UserPortController;
+use App\Http\Controllers\NewsController;
+use App\Http\Controllers\ComparisonController;
+use App\Http\Controllers\RiskScoringController;
+use App\Http\Controllers\VisualizationController;
+
 
 Route::get('/', function () {
     return redirect('/login');
@@ -31,43 +36,27 @@ Route::middleware('auth')->group(function () {
 
 
 
-    // Global Country Dashboard
+    
     Route::get('/user/country', [CountryController::class, 'index'])
         ->name('user.country');
-
-    // Port Location
     Route::get('/user/port-location', [UserPortController::class, 'index'])
         ->name('user.port');
-
-    // Weather
     Route::get('/user/weather', [WeatherController::class, 'index'])
         ->name('user.weather');
-
-    // Currency
     Route::get('/user/currency', [CurrencyController::class, 'index'])
         ->name('user.currency');
-
-    // Risk
-    Route::view('/user/risk', 'user.risk')->name('user.risk');
-
-    // News
-    Route::view('/user/news', 'user.news')->name('user.news');
-
-    // Visualization
-    Route::view('/user/visualization', 'user.visualization')
-        ->name('user.visualization');
-
-    // Comparison
-    Route::view('/user/comparison', 'user.comparison')
-        ->name('user.comparison');
-
-
+    Route::get('/user/risk-scoring', [RiskScoringController::class,'index'])
+    ->name('user.risk-scoring');
+    Route::get('/user/news', [NewsController::class, 'index'])
+        ->name('user.news');
+    Route::get('/user/visualization', [VisualizationController::class, 'index'])
+       ->name('user.visualization');
+    Route::get('/user/comparison', [ComparisonController::class, 'index'])
+       ->name('user.comparison');
     Route::get('/user/watchlist', [WatchlistController::class, 'index'])
         ->name('user.watchlist');
-
     Route::post('/user/watchlist', [WatchlistController::class, 'store'])
         ->name('watchlist.store');
-
     Route::delete('/user/watchlist/{id}', [WatchlistController::class, 'destroy'])
         ->name('watchlist.destroy');
 });
