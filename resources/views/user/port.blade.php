@@ -129,7 +129,7 @@ const markers = {};
 
 @foreach($ports as $port)
 
-@if($port->latitude && $port->longitude)
+@if(!is_null($port->latitude) && !is_null($port->longitude))
 
 const marker{{ $port->id }} = L.marker([
     {{ $port->latitude }},
@@ -163,25 +163,56 @@ markers[{{ $port->id }}] = marker{{ $port->id }};
 @endif
 
 @endforeach
+
 Object.values(markers).forEach(marker => {
     marker.addTo(map);
 });
 
+const infoName = document.getElementById('infoName');
+const infoCountry = document.getElementById('infoCountry');
+const infoStatus = document.getElementById('infoStatus');
+const infoRisk = document.getElementById('infoRisk');
+const infoDescription = document.getElementById('infoDescription');
+
+function showInfo(info){
+    infoName.innerHTML = info.name;
+    infoCountry.innerHTML = info.country;
+    infoStatus.innerHTML = info.status;
+    infoRisk.innerHTML = info.risk;
+    infoDescription.innerHTML = info.description;
+}
+
+function clearInfo(message){
+    infoName.innerHTML = '-';
+    infoCountry.innerHTML = '-';
+    infoStatus.innerHTML = '-';
+    infoRisk.innerHTML = '-';
+    infoDescription.innerHTML = message || '-';
+}
+
 document.getElementById('portSelect').addEventListener('change', function(){
 
     const id = this.value;
+    const marker = markers[id];
 
-    if(id && markers[id]){
+    if(id && marker){
 
-        map.setView(markers[id].getLatLng(),8);
+        map.setView(marker.getLatLng(), 8);
+        marker.openPopup();
+        showInfo(marker.info);
 
-        markers[id].openPopup();
+    } else if(id && !marker){
 
-        document.getElementById('infoName').innerHTML = markers[id].info.name;
-        document.getElementById('infoCountry').innerHTML = markers[id].info.country;
-        document.getElementById('infoStatus').innerHTML = markers[id].info.status;
-        document.getElementById('infoRisk').innerHTML = markers[id].info.risk;
-        document.getElementById('infoDescription').innerHTML = markers[id].info.description;
+        // Port dipilih tapi tidak punya koordinat (latitude/longitude kosong di database)
+        map.closePopup();
+        map.setView([10, 105], 4);
+        clearInfo('Koordinat lokasi belum tersedia untuk pelabuhan ini.');
+
+    } else {
+
+        map.closePopup();
+        map.setView([10, 105], 4);
+        clearInfo();
 
     }
 
@@ -196,9 +227,7 @@ countrySelect.addEventListener('change', function () {
     const country = this.value;
 
     Object.values(markers).forEach(marker => {
-
         map.removeLayer(marker);
-
     });
 
     let first = null;
@@ -206,29 +235,32 @@ countrySelect.addEventListener('change', function () {
 
     Array.from(portSelect.options).forEach(option => {
 
-        if(option.value == ""){
-
+        if(option.value === ""){
             option.hidden = false;
             return;
-
         }
 
+        // Pakai data-country dari <option>, bukan marker.country,
+        // karena marker bisa undefined kalau port tidak punya koordinat
+        const optCountry = option.dataset.country;
         const marker = markers[option.value];
 
-        if(country == "" || marker.country === country){
+        if(country === "" || optCountry === country){
 
             option.hidden = false;
 
-            marker.addTo(map);
+            if(marker){
 
-            if(first === null){
+                marker.addTo(map);
 
-                first = marker;
-                firstId = option.value;
+                if(first === null){
+                    first = marker;
+                    firstId = option.value;
+                }
 
             }
 
-        }else{
+        } else {
 
             option.hidden = true;
 
@@ -238,23 +270,16 @@ countrySelect.addEventListener('change', function () {
 
     if(first){
 
-        map.setView(first.getLatLng(),8);
-
+        map.setView(first.getLatLng(), 8);
         first.openPopup();
-
         portSelect.value = firstId;
+        showInfo(first.info);
 
-        document.getElementById('infoName').innerHTML = first.info.name;
-        document.getElementById('infoCountry').innerHTML = first.info.country;
-        document.getElementById('infoStatus').innerHTML = first.info.status;
-        document.getElementById('infoRisk').innerHTML = first.info.risk;
-        document.getElementById('infoDescription').innerHTML = first.info.description;
-
-    }else{
+    } else {
 
         portSelect.value = "";
-
-        map.setView([10,105],4);
+        map.setView([10, 105], 4);
+        clearInfo();
 
     }
 

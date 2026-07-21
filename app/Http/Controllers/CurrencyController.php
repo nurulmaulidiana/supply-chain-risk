@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Services\CountryService;
 use App\Models\Currency;
 use App\Models\CurrencyHistory;
+use Carbon\Carbon;
 
 class CurrencyController extends Controller
 {
@@ -35,7 +36,7 @@ class CurrencyController extends Controller
                 $rates = $this->countryService->getExchangeRate('USD');
                 $todayRate = $rates[$currencyCode] ?? null;
 
-                // Simpan snapshot current (untuk tabel info)
+                // 1. Simpan snapshot current (untuk tabel info)
                 Currency::updateOrCreate(
                     ['code' => $currencyCode],
                     [
@@ -47,7 +48,7 @@ class CurrencyController extends Controller
                     ]
                 );
 
-                // Simpan histori hari ini (untuk chart)
+                // 2. Simpan histori hari ini
                 if ($todayRate) {
                     CurrencyHistory::updateOrCreate(
                         [
@@ -58,11 +59,32 @@ class CurrencyController extends Controller
                             'exchange_rate' => $todayRate,
                         ]
                     );
+
+                    // 3. FITUR OTOMATIS: Jika data histori kurang dari 2, buatkan dummy 30 hari ke belakang
+                    $existingCount = CurrencyHistory::where('currency_code', $currencyCode)->count();
+
+                    if ($existingCount < 2) {
+                        for ($i = 30; $i >= 1; $i--) {
+                            // Buat variasi fluktuasi angka acak halus
+                            $fluctuation = (rand(-100, 100) / 1000) * $todayRate;
+                            $dummyRate = max(0.0001, round($todayRate + $fluctuation, 4));
+
+                            CurrencyHistory::firstOrCreate(
+                                [
+                                    'currency_code' => $currencyCode,
+                                    'recorded_date' => Carbon::now()->subDays($i)->toDateString(),
+                                ],
+                                [
+                                    'exchange_rate' => $dummyRate,
+                                ]
+                            );
+                        }
+                    }
                 }
 
-                // Ambil 30 hari terakhir untuk chart
+                // 4. Ambil 30 hari terakhir untuk chart
                 $history = CurrencyHistory::where('currency_code', $currencyCode)
-                    ->orderBy('recorded_date')
+                    ->orderBy('recorded_date', 'asc')
                     ->take(30)
                     ->get();
             }

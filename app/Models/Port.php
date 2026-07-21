@@ -11,6 +11,8 @@ class Port extends Model
         'country',
         'status',
         'risk_level',
+        'latitude',
+        'longitude',
         'description'
     ];
 }
