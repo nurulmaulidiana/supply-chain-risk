@@ -9,36 +9,43 @@ class VisualizationController extends Controller
 {
     public function index()
     {
-        // =========================
-        // RISK DATA
-        // =========================
+       
+        // RISK DATA (sumber utama urutan negara)
+       
         $riskScores = RiskScore::orderBy('created_at', 'desc')->get();
 
         $countries = $riskScores->pluck('country');
         $scores    = $riskScores->pluck('total_score');
 
-        // dipakai buat kasih warna beda-beda tiap bar sesuai level risiko
         $riskColors = $riskScores->map(function ($item) {
             return match ($item->risk_level) {
-                'High Risk'   => '#dc3545', // merah
-                'Medium Risk' => '#ffc107', // kuning
-                default       => '#198754', // hijau
+                'High Risk'   => '#dc3545',
+                'Medium Risk' => '#ffc107',
+                default       => '#198754',
             };
         });
 
-        // =========================
-        // ECONOMIC DATA
-        // =========================
-        $economicData = EconomicData::orderBy('country')->get();
-
-        $economicCountries = $economicData->pluck('country');
-        $gdp        = $economicData->pluck('gdp');
-        $inflation  = $economicData->pluck('inflation');
-
-        // =========================
-        // CURRENCY DATA
-        // =========================
+       
+        // CURRENCY DATA 
         $currency = $riskScores->pluck('currency_score');
+
+        // ECONOMIC DATA — DISAMAKAN ke daftar negara yang sama dengan
+        // risk_scores, supaya semua 4 grafik menampilkan negara & urutan
+        // yang identik dan bisa dibandingkan langsung.
+
+        $economicByCountry = EconomicData::whereIn('country', $countries)
+            ->get()
+            ->keyBy('country');
+
+        $economicCountries = $countries;
+
+        $gdp = $countries->map(function ($countryName) use ($economicByCountry) {
+            return $economicByCountry->get($countryName)->gdp ?? 0;
+        });
+
+        $inflation = $countries->map(function ($countryName) use ($economicByCountry) {
+            return $economicByCountry->get($countryName)->inflation ?? 0;
+        });
 
         return view('user.visualization', compact(
             'riskScores',

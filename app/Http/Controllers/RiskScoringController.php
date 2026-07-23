@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Services\CountryService;
 use App\Services\RiskService;
 use App\Models\RiskScore;
+use App\Models\CurrencyHistory;
 
 class RiskScoringController extends Controller
 {
@@ -96,22 +97,9 @@ class RiskScoringController extends Controller
             $inflation = 0;
         }
 
-        // 3. Currency Data (Revisi Logika Kurs USD)
-        $currency = "stable";
+        // 3. Currency Data 
         $currencyCode = $country['currencies'][0]['code'] ?? "USD";
-        $rates = $this->countryService->getExchangeRate("USD");
-
-        if ($rates && isset($rates[$currencyCode])) {
-            $rate = $rates[$currencyCode];
-
-            if ($rate < 0.5) {
-                $currency = "unstable";
-            } elseif ($rate < 1) {
-                $currency = "medium";
-            } else {
-                $currency = "stable";
-            }
-        }
+        $currency = $this->classifyCurrencyStability($currencyCode);
 
         // 4. News Data (Revisi Keyword Sentiment Analysis)
         $articles = $this->countryService->getNews($selectedCountry);
@@ -158,26 +146,18 @@ class RiskScoringController extends Controller
         $riskLevel = $this->riskService->riskLevel($totalScore);
 
         RiskScore::updateOrCreate(
-
-    [
-        'country' => $selectedCountry
-    ],
-
-    [
-        'weather_score' => $weatherScore,
-
-        'inflation_score' => $inflationScore,
-
-        'news_score' => $newsScore,
-
-        'currency_score' => $currencyScore,
-
-        'total_score' => $totalScore,
-
-        'risk_level' => $riskLevel
-    ]
-
-);
+            [
+                'country' => $selectedCountry
+            ],
+            [
+                'weather_score' => $weatherScore,
+                'inflation_score' => $inflationScore,
+                'news_score' => $newsScore,
+                'currency_score' => $currencyScore,
+                'total_score' => $totalScore,
+                'risk_level' => $riskLevel
+            ]
+        );
 
         return view('user.risk-scoring', compact(
             'countries',
@@ -196,5 +176,35 @@ class RiskScoringController extends Controller
             'totalScore',
             'riskLevel'
         ));
+    }
+
+    
+    private function classifyCurrencyStability($currencyCode)
+    {
+        $history = CurrencyHistory::where('currency_code', $currencyCode)
+            ->orderBy('recorded_date', 'asc')
+            ->get();
+
+        if ($history->count() < 2) {
+            return "stable";
+        }
+
+        $oldest = $history->first()->exchange_rate;
+        $newest = $history->last()->exchange_rate;
+
+        if ($oldest == 0) {
+            return "stable";
+        }
+
+        // Persentase perubahan kurs dari titik data pertama ke terakhir
+        $percentChange = abs((($newest - $oldest) / $oldest) * 100);
+
+        if ($percentChange >= 5) {
+            return "unstable";
+        } elseif ($percentChange >= 1.5) {
+            return "medium";
+        }
+
+        return "stable";
     }
 }

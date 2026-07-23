@@ -14,6 +14,18 @@
 
 @endif
 
+@if(session('error'))
+
+<div class="alert alert-danger alert-dismissible fade show" role="alert">
+
+    {{ session('error') }}
+
+    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+
+</div>
+
+@endif
+
 <div class="d-flex justify-content-between align-items-center mb-4">
 
     <h4 class="mb-0">Kelola User</h4>
@@ -42,7 +54,8 @@
                     <th>Nama</th>
                     <th>Email</th>
                     <th width="120">Role</th>
-                    <th width="180">Aksi</th>
+                    <th width="100">Status</th>
+                    <th width="220">Aksi</th>
 
                 </tr>
 
@@ -63,6 +76,14 @@
                     <td>{{ ucfirst($user->role) }}</td>
 
                     <td>
+                        @if($user->is_active)
+                            <span class="badge bg-success">Aktif</span>
+                        @else
+                            <span class="badge bg-secondary">Nonaktif</span>
+                        @endif
+                    </td>
+
+                    <td>
 
                         <a href="{{ route('users.edit', $user->id) }}"
                            class="btn btn-warning btn-sm">
@@ -70,6 +91,24 @@
                             Edit
 
                         </a>
+
+                        @if($user->id != auth()->id())
+
+                        <form action="{{ route('users.toggleStatus', $user->id) }}"
+                              method="POST"
+                              style="display:inline;">
+
+                            @csrf
+                            @method('PATCH')
+
+                            <button type="submit"
+                                    class="btn btn-sm {{ $user->is_active ? 'btn-outline-secondary' : 'btn-outline-success' }}">
+
+                                {{ $user->is_active ? 'Nonaktifkan' : 'Aktifkan' }}
+
+                            </button>
+
+                        </form>
 
                         <form action="{{ route('users.destroy', $user->id) }}"
                               method="POST"
@@ -88,6 +127,8 @@
 
                         </form>
 
+                        @endif
+
                     </td>
 
                 </tr>
@@ -96,7 +137,7 @@
 
                 <tr>
 
-                    <td colspan="5" class="text-center">
+                    <td colspan="6" class="text-center">
 
                         Belum ada data user.
 
